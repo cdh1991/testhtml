@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ECharts AMap Test</title>
+    <style>
+    html,body,#map {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- external dependencies -->
+    <script src="http://webapi.amap.com/maps?v=1.3&key=cb6abc25f757e628e8eb2db7a469be75&plugin=AMap.CustomLayer"></script>
+    <script src="http://cdn.bootcss.com/echarts/3.4.0/echarts.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- import the extension -->
+    <script src="echarts-amap.min.js"></script>
+
+    <script type="text/javascript">
+      var echart = echarts.init(document.getElementById('map'))
+        var a 
+    $.get('geojson_line.json', function(data) {
+        var hStep = 300 / (data["features"].length - 1);
+        var busLines = []
+        for (var i = 0; i < data["features"].length; i += 1) {
+            var points = data["features"][i]["geometry"]["coordinates"]
+
+            
+            busLines.push({coords:points,lineStyle:{normal:{color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * i))}}})
+            
+        };
+        // var busLines = [].concat.apply([], data.map(function (busLine, idx) {
+        //     var prevPt;
+        //     var points = [];
+        //     for (var i = 0; i < busLine.length; i += 2) {
+        //         var pt = [busLine[i], busLine[i + 1]];
+        //         if (i > 0) {
+        //             pt = [
+        //                 prevPt[0] + pt[0],
+        //                 prevPt[1] + pt[1]
+        //             ];
+        //         }
+        //         prevPt = pt;
+
+        //         points.push([pt[0] / 1e4, pt[1] / 1e4]);
+        //     }
+        //     console.log(idx)
+        //     return {
+        //         coords: points,lineStyle: {normal: {color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * idx))}}
+        //     };
+        // }))
+        console.log(busLines)
+    echart.setOption( {
+        amap: {
+          center: [114.1, 22.64],
+          zoom: 12,
+          mapStyle: 'amap://styles/dark'
+        },
+
+        series: [{
+            type: 'lines',
+            coordinateSystem: 'amap',
+            polyline: true,
+            data: busLines,
+            silent: true,
+            lineStyle: {
+                normal: {
+                    // color: '#c23531',
+                    // color: 'rgb(200, 35, 45)',
+                    opacity: 0.2,
+                    width: 1
+                }
+            },
+            progressiveThreshold: 500,
+            progressive: 200
+        }, {
+            type: 'lines',
+            coordinateSystem: 'amap',
+            polyline: true,
+            data: busLines,
+            lineStyle: {
+                normal: {
+                    width: 0
+                }
+            },
+            effect: {
+                constantSpeed: 20,
+                show: true,
+                trailLength: 0.1,
+                symbolSize: 1.5
+            },
+            zlevel: 1
+        }]
+    })
+    return a = busLines
+})
+function download(filename,content,contentType) {
+    if (!contentType) contentType = 'application/octet-stream';
+    var a = document.createElement('a');
+    var blob = new Blob([content], { 'type': contentType });
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+}
+</script>
+  </body>
+</html>
